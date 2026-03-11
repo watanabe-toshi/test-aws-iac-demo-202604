@@ -30,6 +30,27 @@ resource "aws_s3_object" "faq" {
   etag         = filemd5("${path.module}/knowledge/faq.json")
 }
 
+resource "aws_dynamodb_table" "chat_history" {
+  name         = "${local.name_prefix}-chat-history"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "session_id"
+  range_key    = "timestamp"
+
+  attribute {
+    name = "session_id"
+    type = "S"
+  }
+
+  attribute {
+    name = "timestamp"
+    type = "S"
+  }
+
+  tags = {
+    Name = "${local.name_prefix}-chat-history"
+  }
+}
+
 resource "aws_iam_role" "lambda_role" {
   name = "${local.name_prefix}-lambda-role"
 
