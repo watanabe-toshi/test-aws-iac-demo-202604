@@ -1,31 +1,18 @@
-# AWS Terraform IaC Demo for New Hires
+# AWS Terraform IaC Demo
 
 ## 概要
 
-このリポジトリは、新入社員向けの IaC 学習用デモです。  
-Terraform を利用して、AWS 上に「AIチャット基盤のモック環境」を構築します。
-
-今回は本物の生成AIは利用せず、API Gateway で受け付けたリクエストを Lambda が処理し、S3 に配置した FAQ データを参照して回答を返します。  
-AI基盤の考え方を学ぶための最小構成として作成しています。
-
----
+Terraform を利用して、AWS 上に AIチャット基盤を模したモック環境を構築するデモです。  
+API Gateway、Lambda、S3、CloudWatch Logs を組み合わせ、FAQ ベースで回答する簡易 API を作成します。
 
 ## 技術スタック
 
-- **Terraform**
-  - AWS リソースの構築と管理
-- **AWS API Gateway**
-  - 外部からのリクエストを受け付ける API の入口
-- **AWS Lambda**
-  - チャット処理を行うアプリケーション本体
-- **Amazon S3**
-  - FAQ やナレッジデータの保存先
-- **Amazon CloudWatch Logs**
-  - Lambda の実行ログ確認
-- **Python**
-  - Lambda 関数の実装言語
-
----
+- Terraform
+- AWS API Gateway
+- AWS Lambda
+- Amazon S3
+- Amazon CloudWatch Logs
+- Python
 
 ## 構成
 
@@ -37,25 +24,16 @@ API Gateway  ---> Lambda(chat mock) ---> S3(knowledge docs)
                       |
                       v
                CloudWatch Logs
+```
 
-## 各コンポーネントの役割
+## 確認
+```text
+curl -X POST "$(terraform output -raw chat_api_url)" \
+  -H "Content-Type: application/json; charset=utf-8" \
+  --data-binary @request.json
+```
 
-User
+## 補足
 
-API に質問を送る利用者
-
-API Gateway
-
-/chat エンドポイントを公開し、リクエストを受け付ける
-
-Lambda
-
-リクエスト内容を処理し、FAQ から回答を生成する
-
-S3
-
-FAQ データを保存するナレッジ置き場
-
-CloudWatch Logs
-
-実行ログやエラー内容を確認するためのログ基盤
+本デモは学習用の最小構成です。  
+本番環境では、Bedrock、認証認可、会話履歴管理、監視、セキュリティ強化などを追加して拡張します。
