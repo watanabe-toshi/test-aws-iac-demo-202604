@@ -9,3 +9,7 @@ output "api_endpoint" {
 output "chat_api_url" {
   value = "${aws_apigatewayv2_api.http_api.api_endpoint}/chat"
 }
+
+output "chat_history_table_name" {
+  value = aws_dynamodb_table.chat_history.name
+}
