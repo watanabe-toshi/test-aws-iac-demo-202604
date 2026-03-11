@@ -96,6 +96,14 @@ resource "aws_iam_role_policy" "lambda_policy" {
         ]
       },
       {
+        Sid    = "AllowWriteChatHistory"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:PutItem"
+        ]
+        Resource = aws_dynamodb_table.chat_history.arn
+      },
+      {
         Sid    = "AllowLogs"
         Effect = "Allow"
         Action = [
