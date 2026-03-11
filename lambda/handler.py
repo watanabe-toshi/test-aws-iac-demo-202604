@@ -1,8 +1,12 @@
 import json
 import os
+import uuid
+from datetime import datetime, timezone
+
 import boto3
 
 s3 = boto3.client("s3")
+dynamodb = boto3.resource("dynamodb")
 
 
 def load_faq():
@@ -33,16 +37,41 @@ def find_answer(message, faq_items):
     }
 
 
+def save_chat_history(session_id, message, result):
+    table_name = os.environ["HISTORY_TABLE"]
+    table = dynamodb.Table(table_name)
+
+    timestamp = datetime.now(timezone.utc).isoformat()
+
+    table.put_item(
+        Item={
+            "session_id": session_id,
+            "timestamp": timestamp,
+            "question": message,
+            "answer": result["answer"],
+            "source": result["source"],
+            "confidence": str(result["confidence"]),
+            "mode": "mock"
+        }
+    )
+
+    return timestamp
+
+
 def lambda_handler(event, context):
+    raw_body = event.get("body")
+
     try:
-        body = event.get("body") or "{}"
+        body = raw_body or "{}"
         if isinstance(body, str):
             body = json.loads(body)
 
         message = body.get("message", "")
+        session_id = body.get("session_id", str(uuid.uuid4()))
 
         faq_items = load_faq()
         result = find_answer(message, faq_items)
+        timestamp = save_chat_history(session_id, message, result)
 
         response = {
             "answer": result["answer"],
@@ -50,7 +79,9 @@ def lambda_handler(event, context):
             "confidence": result["confidence"],
             "model": "mock-llm-v1",
             "mode": "mock",
-            "input": message
+            "input": message,
+            "session_id": session_id,
+            "timestamp": timestamp
         }
 
         return {
@@ -70,6 +101,7 @@ def lambda_handler(event, context):
             "body": json.dumps(
                 {
                     "error": str(e),
+                    "raw_body": raw_body,
                     "mode": "mock"
                 },
                 ensure_ascii=False
