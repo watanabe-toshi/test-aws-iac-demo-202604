@@ -38,3 +38,24 @@ API Gateway  ---> Lambda(chat mock) ---> S3(knowledge docs)
                       v
                CloudWatch Logs
 
+## 各コンポーネントの役割
+
+User
+
+API に質問を送る利用者
+
+API Gateway
+
+/chat エンドポイントを公開し、リクエストを受け付ける
+
+Lambda
+
+リクエスト内容を処理し、FAQ から回答を生成する
+
+S3
+
+FAQ データを保存するナレッジ置き場
+
+CloudWatch Logs
+
+実行ログやエラー内容を確認するためのログ基盤
