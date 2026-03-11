@@ -138,6 +138,7 @@ resource "aws_lambda_function" "chat_mock" {
     variables = {
       KNOWLEDGE_BUCKET = aws_s3_bucket.knowledge.bucket
       KNOWLEDGE_KEY    = aws_s3_object.faq.key
+      HISTORY_TABLE    = aws_dynamodb_table.chat_history.name
     }
   }
 
